@@ -73,8 +73,8 @@ export default function ProductDetail() {
       quantity: 1
     };
     
-    // Simpan data checkout ke session storage
-    sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    // Simpan data checkout ke localStorage untuk konsistensi dengan checkout.tsx
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
     
     // Arahkan ke halaman checkout
     setLocation('/checkout');
