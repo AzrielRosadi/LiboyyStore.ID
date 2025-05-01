@@ -162,10 +162,32 @@ const Checkout = () => {
     );
   }
   
+  const handleGoBack = () => {
+    // Kembali ke halaman detail produk
+    if (checkoutData?.productId) {
+      navigate(`/products/${checkoutData.productId}`);
+    } else {
+      // Jika tidak ada productId, kembali ke halaman produk
+      navigate('/products');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Checkout</h1>
+        <div className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            className="mr-4 flex items-center text-gray-600 hover:text-primary transition-colors"
+            onClick={handleGoBack}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali
+          </Button>
+          <h1 className="text-2xl font-bold">Checkout</h1>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
