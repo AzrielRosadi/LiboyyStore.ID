@@ -27,10 +27,6 @@ export default function ProductCategories() {
 
   return (
     <>
-      <Helmet>
-        <title>Semua Layanan | LiboyyStore.ID</title>
-        <meta name="description" content="Layanan top up game dan jasa social media dari LiboyyStore.ID" />
-      </Helmet>
       
       <div className="py-10 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -55,7 +51,7 @@ export default function ProductCategories() {
           <div className="mb-12">
             <AnimatedContainer 
               className="mb-6"
-              animation="fadeInUp"
+              animation="fadeIn"
             >
               <h2 className="text-2xl font-bold border-l-4 border-primary pl-3 text-gray-800">Game</h2>
             </AnimatedContainer>
@@ -101,7 +97,7 @@ export default function ProductCategories() {
           <div>
             <AnimatedContainer 
               className="mb-6"
-              animation="fadeInUp"
+              animation="fadeIn"
             >
               <h2 className="text-2xl font-bold border-l-4 border-purple-500 pl-3 text-gray-800">Social Media</h2>
             </AnimatedContainer>

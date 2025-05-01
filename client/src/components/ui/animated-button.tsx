@@ -17,6 +17,7 @@ interface AnimatedButtonProps extends ButtonPropsWithoutMotion {
   iconPosition?: 'left' | 'right';
   animationType?: 'subtle' | 'expand' | 'bounce' | 'pulse' | 'shine';
   withRipple?: boolean;
+  children?: React.ReactNode;
 }
 
 export function AnimatedButton({

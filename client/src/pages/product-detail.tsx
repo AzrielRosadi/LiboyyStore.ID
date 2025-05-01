@@ -3,7 +3,8 @@ import { useLocation, useParams } from 'wouter';
 import { 
   getProductCategoryById, 
   ProductOption,
-  getCategoryById 
+  getCategoryById,
+  categories
 } from '@/lib/product-categories';
 import { 
   AnimatedContainer, 
