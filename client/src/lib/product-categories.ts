@@ -267,9 +267,20 @@ export function getCategoryById(id: string): Category | undefined {
 export function getProductCategoryById(
   id: string,
 ): ProductCategoryDetail | undefined {
+  // Pastikan id tidak undefined
+  if (!id) {
+    console.error("getProductCategoryById called with undefined/empty ID");
+    return undefined;
+  }
+  
+  console.log("Looking for product category with ID:", id);
+  
   // Coba langsung cari berdasarkan ID
   const directMatch = productCategories.find((prod) => prod.id === id);
-  if (directMatch) return directMatch;
+  if (directMatch) {
+    console.log("Found direct match for ID:", id);
+    return directMatch;
+  }
   
   // Jika tidak ada, coba dengan pemetaan ID
   let mappedId = '';
@@ -280,9 +291,19 @@ export function getProductCategoryById(
   else if (id === 'ig-likes') mappedId = 'instagram-likes';
   else if (id === 'tiktok-followers') mappedId = 'tiktok-followers';
   else if (id === 'tiktok-likes') mappedId = 'tiktok-likes';
-  else return undefined;
+  else {
+    console.warn("No mapping found for ID:", id);
+    return undefined;
+  }
   
-  return productCategories.find((prod) => prod.id === mappedId);
+  console.log("Mapped ID", id, "to", mappedId);
+  const mappedMatch = productCategories.find((prod) => prod.id === mappedId);
+  
+  if (!mappedMatch) {
+    console.error("No product found for mapped ID:", mappedId);
+  }
+  
+  return mappedMatch;
 }
 
 // Fungsi utilitas untuk mendapatkan opsi produk berdasarkan ID kategori dan ID opsi

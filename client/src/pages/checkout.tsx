@@ -56,21 +56,40 @@ const Checkout = () => {
   
   const createOrderMutation = useMutation({
     mutationFn: (data: any) => {
+      console.log("Submitting order data:", data);
       return apiRequest('POST', '/api/orders', data);
     },
     onSuccess: async (response) => {
-      const order = await response.json();
-      
-      // Add to order history in localStorage
-      addOrder(order);
-      
-      // Clear checkout data
-      localStorage.removeItem('checkoutData');
-      
-      // Navigate to payment confirmation
-      navigate(`/payment-confirmation/${order.id}`);
+      try {
+        const order = await response.json();
+        console.log("Order created successfully:", order);
+        
+        // Add to order history in localStorage
+        addOrder(order);
+        
+        // Clear checkout data
+        localStorage.removeItem('checkoutData');
+        
+        // Show success toast
+        toast({
+          variant: "default",
+          title: "Pesanan Berhasil",
+          description: "Pesanan Anda sedang diproses. Silakan lakukan pembayaran.",
+        });
+        
+        // Navigate to payment confirmation
+        navigate(`/payment-confirmation/${order.id}`);
+      } catch (error) {
+        console.error("Error processing order response:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Terjadi kesalahan saat memproses respon order.",
+        });
+      }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Order creation error:", error);
       toast({
         variant: "destructive",
         title: "Error",

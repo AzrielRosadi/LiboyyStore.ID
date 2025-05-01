@@ -38,7 +38,7 @@ export default function ProductDetail() {
   useEffect(() => {
     if (!productCategory) {
       console.error(`Product category not found for ID: ${id}`);
-      console.log("Available product categories:", productCategories.map(p => p.id));
+      console.log("Available product categories:", productCategories.map((p: any) => p.id));
     }
     if (!category) {
       console.error(`Category not found for product category: ${productCategory?.category}`);
