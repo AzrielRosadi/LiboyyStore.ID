@@ -1,0 +1,134 @@
+/* Font Awesome Icons */
+.fas {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.far {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 400;
+}
+
+.fab {
+  font-family: 'Font Awesome 5 Brands';
+  font-weight: 400;
+}
+
+/* Individual icons */
+.fa-shield-alt:before {
+  content: "\f3ed";
+}
+
+.fa-bolt:before {
+  content: "\f0e7";
+}
+
+.fa-tags:before {
+  content: "\f02c";
+}
+
+.fa-headset:before {
+  content: "\f590";
+}
+
+.fa-mobile-alt:before {
+  content: "\f3cd";
+}
+
+.fa-gamepad:before {
+  content: "\f11b";
+}
+
+.fa-instagram:before {
+  content: "\f16d";
+}
+
+.fa-tiktok:before {
+  content: "\e07b";
+}
+
+.fa-heart:before {
+  content: "\f004";
+}
+
+.fa-shopping-cart:before {
+  content: "\f07a";
+}
+
+.fa-credit-card:before {
+  content: "\f09d";
+}
+
+.fa-truck:before {
+  content: "\f0d1";
+}
+
+.fa-check-circle:before {
+  content: "\f058";
+}
+
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add icon animation */
+.icon-pulse {
+  animation: icon-pulse 2s infinite;
+}
+
+@keyframes icon-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-bounce {
+  animation: icon-bounce 2s infinite;
+}
+
+@keyframes icon-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Add shimmer animation */
+.shimmer {
+  background: linear-gradient(to right, 
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

@@ -15,22 +15,15 @@ import Footer from "@/components/layout/footer";
 import { Loading } from "@/components/ui/loading";
 import { initAOS } from "@/lib/animation";
 import { motion, AnimatePresence } from "framer-motion";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 function App() {
   const [loading, setLoading] = useState(true);
 
+  // Initialize AOS for scroll animations
+  initAOS();
+  
   useEffect(() => {
-    // Initialize AOS for scroll animations
-    AOS.init({
-      duration: 800,
-      easing: 'ease-in-out',
-      once: false,
-      mirror: false,
-    });
-
-    // Simulate initial loading
+    // Simulate initial loading with a nice splash screen
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);

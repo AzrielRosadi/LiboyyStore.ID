@@ -13,18 +13,33 @@ export const initAOS = () => {
       once: false, // whether animation should happen only once
       mirror: false, // whether elements should animate out while scrolling past them
       offset: 100, // offset (in px) from the original trigger point
-      delay: 0, // delay animation
+      delay: 0, // delay animation,
+      // Customize animations
+      animatedClassName: 'aos-animate',
+      disable: false, // disable on mobile devices
+      startEvent: 'DOMContentLoaded', // name of the event dispatched on the document, that AOS should initialize on
     });
 
     // Re-initialize AOS when window is resized
-    window.addEventListener('resize', () => {
+    const handleResize = () => {
       AOS.refresh();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Re-initialize AOS when content changes
+    const observer = new MutationObserver(() => {
+      AOS.refresh();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
 
     return () => {
-      window.removeEventListener('resize', () => {
-        AOS.refresh();
-      });
+      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
     };
   }, []);
 };
