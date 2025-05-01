@@ -30,15 +30,7 @@ const multerStorage = multer.diskStorage({
 
 const upload = multer({ storage: multerStorage });
 
-// Extend Express Request type to include session and file properties
-declare global {
-  namespace Express {
-    interface Request {
-      session: any;
-      file?: any;
-    }
-  }
-}
+// Request type extensions are now in types.d.ts
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Make uploads directory accessible
