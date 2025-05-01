@@ -4,6 +4,7 @@ import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ProductDetail from "@/pages/product-detail";
+import ProductCategories from "@/pages/product-categories";
 import Checkout from "@/pages/checkout";
 import PaymentConfirmation from "@/pages/payment-confirmation";
 import OrderHistory from "@/pages/order-history";
@@ -64,7 +65,8 @@ function App() {
         <main className="pt-16">
           <Switch>
             <Route path="/" component={Home} />
-            <Route path="/product/:category/:id" component={ProductDetail} />
+            <Route path="/products" component={ProductCategories} />
+            <Route path="/product/:id" component={ProductDetail} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/payment-confirmation/:orderId" component={PaymentConfirmation} />
             <Route path="/order-history" component={OrderHistory} />

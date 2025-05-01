@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { products } from '@/lib/data';
+import { categories } from '@/lib/product-categories';
 import { motion } from 'framer-motion';
 import { 
   AnimatedContainer, 
@@ -14,17 +14,12 @@ import { RippleButton } from '@/components/ui/ripple-button';
 const ServicesSection = () => {
   const [, setLocation] = useLocation();
   
-  const handleServiceClick = useCallback((category: string, id: string) => {
-    setLocation(`/product/${category}/${id}`);
+  const handleServiceClick = useCallback((id: string) => {
+    setLocation(`/product/${id}`);
   }, [setLocation]);
 
-  // Get one product from each category for display
-  const showcaseProducts = [
-    products.find(p => p.category === 'ml'),
-    products.find(p => p.category === 'ff'),
-    products.find(p => p.category === 'instagram'),
-    products.find(p => p.category === 'tiktok')
-  ];
+  // Get showcase categories (first four categories)
+  const showcaseCategories = categories.slice(0, 4);
 
   // Animation variants
   const containerVariants = {
@@ -33,19 +28,6 @@ const ServicesSection = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
       }
     }
   };
@@ -75,36 +57,36 @@ const ServicesSection = () => {
           staggerChildren={0.1}
           delay={0.2}
         >
-          {showcaseProducts.map((product, index) => product && (
+          {showcaseCategories.map((category) => (
             <FadeInItem 
-              key={product.id}
+              key={category.id}
               variants={fadeInItemVariants}
               className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg cursor-pointer"
-              onClick={() => handleServiceClick(product.category, product.id)}
+              onClick={() => handleServiceClick(category.id)}
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="h-48 overflow-hidden">
                 <img 
-                  src={product.image} 
-                  alt={product.name} 
+                  src={category.image} 
+                  alt={category.name} 
                   className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500" 
                 />
               </div>
               <div className="p-5">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-bold text-lg">{product.name}</h3>
+                  <h3 className="font-bold text-lg">{category.name}</h3>
                   <motion.span 
                     className={`
-                      ${product.category === 'ml' || product.category === 'ff' ? 'bg-blue-100 text-primary' : 'bg-purple-100 text-purple-600'} 
+                      ${category.category === 'games' ? 'bg-blue-100 text-primary' : 'bg-purple-100 text-purple-600'} 
                       rounded-full px-3 py-1 text-xs font-medium
                     `}
                     whileHover={{ scale: 1.1 }}
                   >
-                    {product.category === 'ml' || product.category === 'ff' ? 'Game' : 'Social Media'}
+                    {category.category === 'games' ? 'Game' : 'Social Media'}
                   </motion.span>
                 </div>
-                <p className="text-gray-600 text-sm mb-4">{product.description}</p>
+                <p className="text-gray-600 text-sm mb-4">{category.description}</p>
                 <RippleButton
                   color="primary"
                   fullWidth
@@ -127,7 +109,7 @@ const ServicesSection = () => {
             color="primary"
             size="lg"
             withRipple
-            onClick={() => setLocation('/product/ml/ml001')}
+            onClick={() => setLocation('/products')}
             className="inline-flex items-center"
           >
             Lihat Semua Layanan
