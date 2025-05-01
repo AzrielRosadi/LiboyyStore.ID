@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { useEffect, useState } from "react";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -11,27 +12,73 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import AdminOrderDetail from "@/pages/admin/order-detail";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { Loading } from "@/components/ui/loading";
+import { initAOS } from "@/lib/animation";
+import { motion, AnimatePresence } from "framer-motion";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Initialize AOS for scroll animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: false,
+      mirror: false,
+    });
+
+    // Simulate initial loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-white">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-4xl font-bold text-primary mb-4"
+        >
+          LiboyyStore.ID
+        </motion.div>
+        <Loading type="dots" size="lg" text="Memuat halaman..." />
+      </div>
+    );
+  }
+
   return (
-    <>
-      <Header />
-      <main className="pt-16">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/product/:category/:id" component={ProductDetail} />
-          <Route path="/checkout" component={Checkout} />
-          <Route path="/payment-confirmation/:orderId" component={PaymentConfirmation} />
-          <Route path="/order-history" component={OrderHistory} />
-          <Route path="/admin" component={AdminLogin} />
-          <Route path="/admin/dashboard" component={AdminDashboard} />
-          <Route path="/admin/order/:id" component={AdminOrderDetail} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-      <Footer />
-      <WhatsAppButton />
-    </>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Header />
+        <main className="pt-16">
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/product/:category/:id" component={ProductDetail} />
+            <Route path="/checkout" component={Checkout} />
+            <Route path="/payment-confirmation/:orderId" component={PaymentConfirmation} />
+            <Route path="/order-history" component={OrderHistory} />
+            <Route path="/admin" component={AdminLogin} />
+            <Route path="/admin/dashboard" component={AdminDashboard} />
+            <Route path="/admin/order/:id" component={AdminOrderDetail} />
+            <Route component={NotFound} />
+          </Switch>
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
