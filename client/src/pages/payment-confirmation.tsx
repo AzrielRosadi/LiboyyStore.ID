@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { Order } from '@shared/schema';
 
 interface PaymentConfirmationParams {
   orderId: string;
@@ -19,15 +20,24 @@ const PaymentConfirmation = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
-  const { data: order, error, isLoading } = useQuery({
+  const { data: order, error, isLoading } = useQuery<Order>({
     queryKey: [`/api/orders/${orderId}`],
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Pesanan tidak ditemukan",
-      });
-      navigate('/');
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        if (!response.ok) {
+          throw new Error('Pesanan tidak ditemukan');
+        }
+        return response.json() as Order;
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Pesanan tidak ditemukan",
+        });
+        navigate('/');
+        throw error;
+      }
     }
   });
   

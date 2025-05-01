@@ -159,9 +159,18 @@ const OrderHistory = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            className="mr-4 flex items-center text-gray-600 hover:text-primary transition-colors"
+            onClick={() => navigate('/')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali
+          </Button>
           <h1 className="text-2xl font-bold">Riwayat Pesanan</h1>
-          <Button onClick={() => navigate('/')}>Kembali ke Beranda</Button>
         </div>
         
         {error && (
