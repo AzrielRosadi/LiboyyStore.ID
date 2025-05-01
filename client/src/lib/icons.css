@@ -67,6 +67,38 @@
   content: "\f058";
 }
 
+.fa-chevron-down:before {
+  content: "\f078";
+}
+
+.fa-chevron-up:before {
+  content: "\f077";
+}
+
+.fa-whatsapp:before {
+  content: "\f232";
+}
+
+.fa-user:before {
+  content: "\f007";
+}
+
+.fa-lock:before {
+  content: "\f023";
+}
+
+.fa-money-bill:before {
+  content: "\f0d6";
+}
+
+.fa-chart-bar:before {
+  content: "\f080";
+}
+
+.fa-star:before {
+  content: "\f005";
+}
+
 .fa-spin {
   animation: fa-spin 2s infinite linear;
 }
@@ -113,6 +145,70 @@
   }
 }
 
+.icon-shake {
+  animation: icon-shake 2s ease-in-out infinite;
+}
+
+@keyframes icon-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+.icon-float {
+  animation: icon-float 3s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.icon-tada {
+  animation: icon-tada 2s ease infinite;
+}
+
+@keyframes icon-tada {
+  0% {
+    transform: scale(1);
+  }
+  10%, 20% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  30%, 50%, 70%, 90% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  40%, 60%, 80% {
+    transform: scale(1.1) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.icon-flip {
+  animation: icon-flip 2s ease-in-out infinite;
+}
+
+@keyframes icon-flip {
+  0%, 100% {
+    transform: rotateY(0);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+}
+
 /* Add shimmer animation */
 .shimmer {
   background: linear-gradient(to right, 
@@ -131,4 +227,46 @@
   100% {
     background-position: 200% 0;
   }
+}
+
+/* Button animations */
+.btn-hover-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-hover-glow:after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.btn-hover-glow:hover:after {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Add 3D button effect */
+.btn-3d {
+  transition: all 0.2s;
+  transform-style: preserve-3d;
+  transform: perspective(500px) translateZ(0);
+  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+}
+
+.btn-3d:hover {
+  transform: perspective(500px) translateZ(10px);
+  box-shadow: 0 7px 14px rgba(50,50,93,.25), 0 3px 6px rgba(0,0,0,.2);
+}
+
+.btn-3d:active {
+  transform: perspective(500px) translateZ(2px);
+  box-shadow: 0 3px 6px rgba(50,50,93,.15), 0 1px 3px rgba(0,0,0,.1);
 }

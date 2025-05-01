@@ -13,22 +13,28 @@ import AdminOrderDetail from "@/pages/admin/order-detail";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Loading } from "@/components/ui/loading";
-import { initAOS } from "@/lib/animation";
 import { motion, AnimatePresence } from "framer-motion";
+import { initAOS, setupAOSListeners } from "@/lib/animation";
 
 function App() {
   const [loading, setLoading] = useState(true);
-
-  // Initialize AOS for scroll animations
-  initAOS();
   
   useEffect(() => {
+    // Initialize AOS for scroll animations
+    initAOS();
+    
+    // Set up AOS listeners and get cleanup function
+    const cleanupAOSListeners = setupAOSListeners();
+
     // Simulate initial loading with a nice splash screen
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      cleanupAOSListeners();
+    };
   }, []);
 
   if (loading) {

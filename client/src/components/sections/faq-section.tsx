@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface FaqItem {
   id: number;
@@ -52,27 +53,123 @@ const FaqSection = () => {
   return (
     <section id="faq" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6 }}
+          data-aos="fade-up"
+        >
           <h2 className="text-3xl font-montserrat font-bold text-gray-800 mb-3">Pertanyaan Umum</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">Temukan jawaban atas pertanyaan yang sering ditanyakan</p>
-        </div>
+        </motion.div>
         
-        <div className="max-w-3xl mx-auto space-y-4">
-          {faqs.map((faq) => (
-            <div key={faq.id} className="border border-gray-200 rounded-lg overflow-hidden">
-              <button 
+        <motion.div 
+          className="max-w-3xl mx-auto space-y-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ staggerChildren: 0.2, delayChildren: 0.3 }}
+        >
+          {faqs.map((faq, index) => (
+            <motion.div 
+              key={faq.id} 
+              className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5,
+                delay: index * 0.1
+              }}
+              viewport={{ once: false, amount: 0.3 }}
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
+            >
+              <motion.button 
                 onClick={() => toggleFaq(faq.id)}
-                className="w-full flex justify-between items-center p-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="w-full flex justify-between items-center p-4 text-left bg-gray-50 hover:bg-gray-100 transition-all"
+                whileHover={{ backgroundColor: '#f0f7ff' }}
+                whileTap={{ scale: 0.99 }}
               >
                 <span className="font-medium">{faq.question}</span>
-                <i className={`fas fa-chevron-down text-primary transition-transform duration-300 ${faq.isOpen ? 'rotate-180' : ''}`}></i>
-              </button>
-              <div className={`bg-white p-4 border-t border-gray-200 ${faq.isOpen ? 'block' : 'hidden'}`}>
-                <p className="text-gray-600">{faq.answer}</p>
-              </div>
-            </div>
+                <motion.i 
+                  className={`fas fa-chevron-down text-primary`}
+                  animate={{ 
+                    rotate: faq.isOpen ? 180 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                ></motion.i>
+              </motion.button>
+
+              <AnimatePresence>
+                {faq.isOpen && (
+                  <motion.div 
+                    className="bg-white p-4 border-t border-gray-200"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ 
+                      height: 'auto', 
+                      opacity: 1,
+                      transition: {
+                        height: {
+                          duration: 0.3,
+                        },
+                        opacity: {
+                          duration: 0.3,
+                          delay: 0.1
+                        }
+                      }
+                    }}
+                    exit={{ 
+                      height: 0, 
+                      opacity: 0,
+                      transition: {
+                        height: {
+                          duration: 0.3,
+                        },
+                        opacity: {
+                          duration: 0.2
+                        }
+                      }
+                    }}
+                  >
+                    <motion.p 
+                      className="text-gray-600"
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                    >
+                      {faq.answer}
+                    </motion.p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        <motion.div 
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
+          <p className="text-gray-600 mb-4">Masih punya pertanyaan?</p>
+          <motion.a
+            href="https://wa.me/6282211944285" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 py-3 text-white bg-primary rounded-lg shadow-md hover:bg-secondary transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <i className="fab fa-whatsapp mr-2 text-lg"></i>
+            Tanya Customer Service
+          </motion.a>
+        </motion.div>
       </div>
     </section>
   );
