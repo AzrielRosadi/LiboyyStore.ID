@@ -1,8 +1,14 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { motion } from 'framer-motion';
+import { motion, MotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface AnimatedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+// Create a subset of ButtonHTMLAttributes to avoid conflicts with MotionProps
+type ButtonPropsWithoutMotion = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>, 
+  keyof MotionProps | "onAnimationStart" | "onDrag" | "onDragEnd" | "onDragStart" | "onAnimationComplete"
+>;
+
+interface AnimatedButtonProps extends ButtonPropsWithoutMotion {
   variant?: 'default' | 'filled' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg';
   color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'danger';

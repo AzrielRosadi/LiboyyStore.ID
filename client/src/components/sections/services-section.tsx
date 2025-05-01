@@ -2,6 +2,14 @@ import { useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { products } from '@/lib/data';
 import { motion } from 'framer-motion';
+import { 
+  AnimatedContainer, 
+  AnimatedText, 
+  FadeInStagger, 
+  FadeInItem,
+  fadeInItemVariants
+} from '@/components/ui/animated-container';
+import { RippleButton } from '@/components/ui/ripple-button';
 
 const ServicesSection = () => {
   const [, setLocation] = useLocation();
@@ -45,32 +53,36 @@ const ServicesSection = () => {
   return (
     <section id="services" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div 
+        <AnimatedContainer 
           className="text-center mb-12"
-          data-aos="fade-up"
-          data-aos-duration="800"
+          animation="fadeIn"
         >
-          <h2 className="text-3xl font-montserrat font-bold text-gray-800 mb-3">Layanan Kami</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">Pilih berbagai layanan top up game dan jasa social media yang kami sediakan dengan harga terbaik</p>
-        </div>
+          <AnimatedText 
+            text="Layanan Kami" 
+            element="h2" 
+            className="text-3xl font-montserrat font-bold text-gray-800 mb-3"
+          />
+          <AnimatedText 
+            text="Pilih berbagai layanan top up game dan jasa social media yang kami sediakan dengan harga terbaik"
+            element="p"
+            className="text-gray-600 max-w-2xl mx-auto"
+            delay={0.3}
+          />
+        </AnimatedContainer>
         
-        <motion.div 
+        <FadeInStagger 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          viewport={{ once: false, amount: 0.3 }}
+          staggerChildren={0.1}
+          delay={0.2}
         >
           {showcaseProducts.map((product, index) => product && (
-            <motion.div 
+            <FadeInItem 
               key={product.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden transition-all hover:scale-105 hover:shadow-lg cursor-pointer"
+              variants={fadeInItemVariants}
+              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg cursor-pointer"
               onClick={() => handleServiceClick(product.category, product.id)}
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.98 }}
-              data-aos="zoom-in-up"
-              data-aos-delay={index * 100}
             >
               <div className="h-48 overflow-hidden">
                 <img 
@@ -93,32 +105,37 @@ const ServicesSection = () => {
                   </motion.span>
                 </div>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-                <motion.button 
-                  className="block w-full bg-primary hover:bg-secondary text-white text-center py-2 rounded-lg transition-colors"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                <RippleButton
+                  color="primary"
+                  fullWidth
+                  className="py-2"
                 >
                   Beli Sekarang
-                </motion.button>
+                </RippleButton>
               </div>
-            </motion.div>
+            </FadeInItem>
           ))}
-        </motion.div>
+        </FadeInStagger>
 
-        <div className="mt-12 text-center">
-          <motion.button 
-            className="inline-flex items-center px-6 py-3 text-white font-medium bg-primary rounded-lg shadow-md hover:bg-secondary transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            data-aos="fade-up"
+        <AnimatedContainer 
+          className="mt-12 text-center"
+          animation="fadeIn"
+          delay={0.6}
+        >
+          <RippleButton
+            variant="filled"
+            color="primary"
+            size="lg"
+            withRipple
             onClick={() => setLocation('/product/ml/ml001')}
+            className="inline-flex items-center"
           >
             Lihat Semua Layanan
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
-          </motion.button>
-        </div>
+          </RippleButton>
+        </AnimatedContainer>
       </div>
     </section>
   );
