@@ -87,6 +87,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.session.contactInfo = validatedData.contact;
       }
       
+      // Create notification for admin
+      await dataStorage.createNotification({
+        title: "Pesanan Baru",
+        message: `Pesanan baru ${order.id} telah dibuat oleh ${validatedData.contact}`,
+        type: "info",
+        isForAdmin: true,
+        orderId: order.id,
+        data: { order }
+      });
+      
       return res.status(201).json(order);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -129,6 +139,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentProof: req.file.filename,
         status: "processing",
         paymentDate: new Date(),
+      });
+      
+      // Create notification for admin about payment confirmation
+      await dataStorage.createNotification({
+        title: "Pembayaran Dikonfirmasi",
+        message: `Bukti pembayaran untuk pesanan ${order.id} telah diunggah oleh ${order.contact}`,
+        type: "success",
+        isForAdmin: true,
+        orderId: order.id,
+        data: { order: updatedOrder }
       });
       
       return res.json(updatedOrder);
@@ -225,6 +245,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting contact messages:", error);
       return res.status(500).json({ message: "Error retrieving contact messages" });
+    }
+  });
+  
+  // Get admin notifications (admin only)
+  app.get("/api/admin/notifications", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const notifications = await dataStorage.getAdminNotifications();
+      return res.json(notifications);
+    } catch (error) {
+      console.error("Error getting notifications:", error);
+      return res.status(500).json({ message: "Error retrieving notifications" });
+    }
+  });
+  
+  // Mark notification as read
+  app.patch("/api/admin/notifications/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      const notification = await dataStorage.markNotificationAsRead(notificationId);
+      return res.json(notification);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      return res.status(500).json({ message: "Error updating notification" });
     }
   });
 
