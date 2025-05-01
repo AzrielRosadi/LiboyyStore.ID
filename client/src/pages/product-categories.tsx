@@ -22,7 +22,18 @@ export default function ProductCategories() {
   }, []);
   
   const handleCategoryClick = useCallback((id: string) => {
-    setLocation(`/product/${id}`);
+    // Map category id to corresponding product category id
+    let productId = '';
+    
+    if (id === 'ml') productId = 'mobile-legends';
+    else if (id === 'ff') productId = 'free-fire';
+    else if (id === 'ig-followers') productId = 'instagram-followers';
+    else if (id === 'ig-likes') productId = 'instagram-likes';
+    else if (id === 'tiktok-followers') productId = 'tiktok-followers';
+    else if (id === 'tiktok-likes') productId = 'tiktok-likes';
+    else productId = id;
+    
+    setLocation(`/product/${productId}`);
   }, [setLocation]);
 
   return (

@@ -22,8 +22,16 @@ export default function ProductDetail() {
   const [accountId, setAccountId] = useState('');
   const [accountZone, setAccountZone] = useState('');
   
-  const category = getCategoryById(id);
+  // Get product category directly
   const productCategory = getProductCategoryById(id);
+  
+  // Determine category based on productCategory
+  const getCategoryBySub = (sub: string | undefined) => {
+    if (!sub) return null;
+    return categories.find(cat => cat.subcategory === sub);
+  };
+  
+  const category = productCategory ? getCategoryBySub(productCategory.category) : null;
   
   // Efek perubahan halaman untuk reset state
   useEffect(() => {
