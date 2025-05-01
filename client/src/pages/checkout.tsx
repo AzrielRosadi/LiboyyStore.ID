@@ -35,11 +35,24 @@ const Checkout = () => {
     // Get checkout data from localStorage
     const data = localStorage.getItem('checkoutData');
     if (data) {
-      setCheckoutData(JSON.parse(data));
+      try {
+        const parsedData = JSON.parse(data);
+        setCheckoutData(parsedData);
+        console.log("Checkout data loaded:", parsedData);
+      } catch (error) {
+        console.error("Failed to parse checkout data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Terjadi kesalahan saat memuat data checkout. Silakan coba lagi.",
+        });
+        navigate('/products');
+      }
     } else {
-      navigate('/');
+      console.log("No checkout data found");
+      navigate('/products');
     }
-  }, [navigate]);
+  }, [navigate, toast]);
   
   const createOrderMutation = useMutation({
     mutationFn: (data: any) => {

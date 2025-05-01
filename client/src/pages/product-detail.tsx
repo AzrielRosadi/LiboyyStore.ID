@@ -4,7 +4,8 @@ import {
   getProductCategoryById, 
   ProductOption,
   getCategoryById,
-  categories
+  categories,
+  productCategories
 } from '@/lib/product-categories';
 import { 
   AnimatedContainer, 
@@ -22,7 +23,7 @@ export default function ProductDetail() {
   const [accountId, setAccountId] = useState('');
   const [accountZone, setAccountZone] = useState('');
   
-  // Get product category directly
+  // Get product category directly using improved getProductCategoryById
   const productCategory = getProductCategoryById(id);
   
   // Determine category based on productCategory
@@ -32,6 +33,18 @@ export default function ProductDetail() {
   };
   
   const category = productCategory ? getCategoryBySub(productCategory.category) : null;
+  
+  // Debug logs
+  useEffect(() => {
+    if (!productCategory) {
+      console.error(`Product category not found for ID: ${id}`);
+      console.log("Available product categories:", productCategories.map(p => p.id));
+    }
+    if (!category) {
+      console.error(`Category not found for product category: ${productCategory?.category}`);
+      console.log("Available categories:", categories.map(c => ({id: c.id, sub: c.subcategory})));
+    }
+  }, [id, productCategory, category]);
   
   // Efek perubahan halaman untuk reset state
   useEffect(() => {

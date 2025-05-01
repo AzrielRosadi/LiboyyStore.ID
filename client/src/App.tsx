@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import NotFound from "@/pages/not-found";
@@ -16,6 +16,17 @@ import Footer from "@/components/layout/footer";
 import { Loading } from "@/components/ui/loading";
 import { motion, AnimatePresence } from "framer-motion";
 import { initAOS, setupAOSListeners } from "@/lib/animation";
+
+// Component untuk memastikan scroll ke atas saat navigasi
+function ScrollToTop() {
+  const [location] = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  
+  return null;
+}
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -61,6 +72,7 @@ function App() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
+        <ScrollToTop />
         <Header />
         <main className="pt-16">
           <Switch>
