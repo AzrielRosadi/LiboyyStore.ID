@@ -46,6 +46,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // API Routes
   // 1. Order Management
+  
+  // Get orders by contact
+  app.get("/api/orders", async (req: Request, res: Response) => {
+    try {
+      const contactInfo = req.query.contact as string;
+      
+      // If no contact info provided and user is not authenticated
+      if (!contactInfo && !req.isAuthenticated()) {
+        return res.status(401).json({ message: "You must provide contact information or be logged in" });
+      }
+      
+      // If user is authenticated as admin, return all orders
+      if (req.isAuthenticated() && (req.user as any)?.isAdmin) {
+        const orders = await dataStorage.getAllOrders();
+        return res.json(orders);
+      }
+      
+      // If user provided contact info, filter orders by contact
+      if (contactInfo) {
+        const orders = await dataStorage.getAllOrders();
+        const filteredOrders = orders.filter(order => order.contact === contactInfo);
+        return res.json(filteredOrders);
+      }
+      
+      // Otherwise return empty array
+      return res.json([]);
+    } catch (error) {
+      console.error("Error getting orders:", error);
+      return res.status(500).json({ message: "Error retrieving orders" });
+    }
+  });
+  
+  // Create new order
   app.post("/api/orders", async (req: Request, res: Response) => {
     try {
       // Validate request body
@@ -56,6 +89,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedData,
         accountZone: validatedData.accountZone || null,
       });
+      
+      // Store contact info in session for future reference
+      if (req.session && validatedData.contact) {
+        req.session.contactInfo = validatedData.contact;
+      }
       
       return res.status(201).json(order);
     } catch (error) {
