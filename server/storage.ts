@@ -121,13 +121,16 @@ export class DatabaseStorage implements IStorage {
 
   // Order methods
   async getAllOrders(filter?: {status?: string}): Promise<Order[]> {
-    let query = db.select().from(orders);
-    
     if (filter?.status) {
-      query = query.where(eq(orders.status, filter.status));
+      return await db.select()
+        .from(orders)
+        .where(eq(orders.status, filter.status))
+        .orderBy(desc(orders.createdAt));
     }
     
-    return await query.orderBy(desc(orders.createdAt));
+    return await db.select()
+      .from(orders)
+      .orderBy(desc(orders.createdAt));
   }
 
   async getOrderById(id: string): Promise<Order | undefined> {

@@ -7,7 +7,7 @@ import { insertOrderSchema, insertContactMessageSchema, updateOrderSchema } from
 import path from "path";
 import fs from "fs";
 import multer from "multer";
-import { auth } from "./auth";
+import { setupAuth, isAuthenticated, isAdmin } from "./auth";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -51,16 +51,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body
       const validatedData = insertOrderSchema.parse(req.body);
       
-      // Generate order ID
-      const orderId = generateOrderId();
-      
       // Create new order
       const order = await dataStorage.createOrder({
-        id: orderId,
         ...validatedData,
         accountZone: validatedData.accountZone || null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
       
       return res.status(201).json(order);
@@ -104,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedOrder = await dataStorage.updateOrder(orderId, {
         paymentProof: req.file.filename,
         status: "processing",
-        updatedAt: new Date(),
+        paymentDate: new Date(),
       });
       
       return res.json(updatedOrder);
@@ -121,10 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertContactMessageSchema.parse(req.body);
       
       // Create contact message
-      const message = await dataStorage.createContactMessage({
-        ...validatedData,
-        createdAt: new Date(),
-      });
+      const message = await dataStorage.createContactMessage(validatedData);
       
       return res.status(201).json(message);
     } catch (error) {
@@ -133,50 +124,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 3. Admin Routes
-  // Admin login
-  app.post("/api/admin/login", async (req: Request, res: Response) => {
-    try {
-      const { username, password } = req.body;
-      
-      // Authenticate admin
-      const token = await auth.authenticateAdmin(username, password);
-      
-      if (!token) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      // Set session data
-      req.session.adminToken = token;
-      req.session.isAdmin = true;
-      
-      return res.json({ message: "Login successful" });
-    } catch (error) {
-      console.error("Error during login:", error);
-      return res.status(500).json({ message: "Error processing login" });
-    }
-  });
-
-  // Admin logout
-  app.post("/api/admin/logout", (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Error destroying session:", err);
-        return res.status(500).json({ message: "Error logging out" });
-      }
-      
-      res.clearCookie("connect.sid");
-      return res.json({ message: "Logout successful" });
-    });
-  });
+  // Set up authentication
+  setupAuth(app);
 
   // Check admin authentication
-  app.get("/api/admin/check", auth.requireAdmin, (req: Request, res: Response) => {
+  app.get("/api/admin/check", isAdmin, (req: Request, res: Response) => {
     return res.json({ authenticated: true });
   });
 
   // Get all orders (admin only)
-  app.get("/api/admin/orders", auth.requireAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/orders", isAdmin, async (req: Request, res: Response) => {
     try {
       const orders = await dataStorage.getAllOrders();
       return res.json(orders);
@@ -187,7 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get order by ID (admin only)
-  app.get("/api/admin/orders/:id", auth.requireAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/orders/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const orderId = req.params.id;
       const order = await dataStorage.getOrderById(orderId);
@@ -204,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update order status (admin only)
-  app.patch("/api/admin/orders/:id", auth.requireAdmin, async (req: Request, res: Response) => {
+  app.patch("/api/admin/orders/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const orderId = req.params.id;
       const order = await dataStorage.getOrderById(orderId);
@@ -219,7 +176,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update order status
       const updatedOrder = await dataStorage.updateOrder(orderId, {
         status: validatedData.status,
-        updatedAt: new Date(),
+        // If status is completed, set completedAt
+        ...(validatedData.status === "completed" ? { completedAt: new Date() } : {})
       });
       
       return res.json(updatedOrder);
@@ -230,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all contact messages (admin only)
-  app.get("/api/admin/contacts", auth.requireAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/contacts", isAdmin, async (req: Request, res: Response) => {
     try {
       const messages = await dataStorage.getAllContactMessages();
       return res.json(messages);
