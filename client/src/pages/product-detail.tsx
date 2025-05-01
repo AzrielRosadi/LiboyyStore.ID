@@ -1,170 +1,246 @@
-import { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'wouter';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { products } from '@/lib/data';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'wouter';
+import { 
+  getProductCategoryById, 
+  ProductOption,
+  getCategoryById 
+} from '@/lib/product-categories';
+import { 
+  AnimatedContainer, 
+  AnimatedText,
+  fadeInItemVariants 
+} from '@/components/ui/animated-container';
+import { RippleButton } from '@/components/ui/ripple-button';
+import { formatCurrency } from '@/lib/helpers';
+import { motion } from 'framer-motion';
 
-interface ProductParams {
-  category: string;
-  id: string;
-}
-
-const ProductDetail = () => {
-  const { category, id } = useParams<ProductParams>();
-  const [, navigate] = useLocation();
-  const { toast } = useToast();
+export default function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  const [, setLocation] = useLocation();
+  const [selectedOption, setSelectedOption] = useState<ProductOption | null>(null);
   const [accountId, setAccountId] = useState('');
   const [accountZone, setAccountZone] = useState('');
-  const [quantity, setQuantity] = useState(1);
   
-  // Find the product in our data
-  const product = products.find(p => p.category === category && p.id === id);
+  const category = getCategoryById(id);
+  const productCategory = getProductCategoryById(id);
   
+  // Efek perubahan halaman untuk reset state
   useEffect(() => {
-    // If product doesn't exist, redirect to home
-    if (!product) {
-      navigate('/');
-    }
-  }, [product, navigate]);
+    setSelectedOption(null);
+    setAccountId('');
+    setAccountZone('');
+  }, [id]);
   
-  if (!product) {
-    return null;
+  if (!category || !productCategory) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Produk tidak ditemukan</h2>
+          <p className="text-gray-600 mb-6">Maaf, produk yang Anda cari tidak tersedia.</p>
+          <RippleButton
+            color="primary"
+            onClick={() => setLocation('/products')}
+          >
+            Kembali ke Daftar Produk
+          </RippleButton>
+        </div>
+      </div>
+    );
   }
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!accountId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "ID Akun harus diisi",
-      });
-      return;
-    }
-    
-    // For game categories, we need zone/server
-    if ((category === 'ml' || category === 'ff') && !accountZone) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Server/Zone harus diisi",
-      });
-      return;
-    }
+  const isGame = category.category === 'games';
+  const isMobileLegends = category.subcategory === 'ml';
+  
+  const handleProceedToCheckout = () => {
+    if (!selectedOption) return;
     
     const checkoutData = {
-      productId: id,
-      productName: product.name,
-      price: product.price,
+      productCategoryId: id,
+      productOptionId: selectedOption.id,
+      productName: `${productCategory.name} ${selectedOption.name}`,
+      price: selectedOption.price,
       accountId,
-      accountZone: accountZone || undefined,
-      quantity: quantity || 1
+      accountZone: isMobileLegends ? accountZone : undefined,
+      quantity: 1
     };
     
-    // Save to localStorage for checkout page
-    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    // Simpan data checkout ke session storage
+    sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData));
     
-    // Redirect to checkout
-    navigate('/checkout');
+    // Arahkan ke halaman checkout
+    setLocation('/checkout');
   };
   
-  const needsZone = category === 'ml' || category === 'ff';
-  const isSocialMedia = category === 'instagram' || category === 'tiktok';
-  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <Card className="overflow-hidden">
-          <div className="md:flex">
-            <div className="md:w-2/5">
+    <div className="min-h-screen py-16 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+            {/* Header */}
+            <div className="h-48 relative overflow-hidden">
               <img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover"
+                src={productCategory.image} 
+                alt={productCategory.name} 
+                className="w-full h-full object-cover" 
               />
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <AnimatedText 
+                  text={productCategory.name} 
+                  element="h1" 
+                  className="text-4xl text-white font-bold"
+                />
+              </div>
+              <RippleButton
+                variant="ghost"
+                color="primary"
+                className="absolute top-3 left-3"
+                onClick={() => setLocation('/products')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </RippleButton>
             </div>
-            <div className="md:w-3/5">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-2xl">{product.name}</CardTitle>
-                    <CardDescription className="mt-2">{product.description}</CardDescription>
-                  </div>
-                  <span className={`
-                    ${category === 'ml' || category === 'ff' ? 'bg-blue-100 text-primary' : 'bg-purple-100 text-purple-600'} 
-                    rounded-full px-3 py-1 text-xs font-medium
-                  `}>
-                    {category === 'ml' || category === 'ff' ? 'Game' : 'Social Media'}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <p className="text-lg font-semibold text-primary">Rp {product.price.toLocaleString('id-ID')}</p>
-                </div>
+            
+            {/* Content */}
+            <div className="p-6">
+              <AnimatedContainer animation="fadeIn">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Pilih {isGame ? 'Diamond' : (id.includes('followers') ? 'Followers' : 'Likes')}</h2>
+                <p className="text-gray-600 mb-6">{productCategory.description}</p>
                 
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="accountId">
-                        {isSocialMedia ? 'Username' : 'ID Game'}
-                      </Label>
-                      <Input 
-                        id="accountId"
-                        value={accountId}
-                        onChange={(e) => setAccountId(e.target.value)}
-                        placeholder={isSocialMedia ? "Masukkan username akun" : "Masukkan ID game anda"}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    {needsZone && (
-                      <div>
-                        <Label htmlFor="accountZone">
-                          {category === 'ml' ? 'Server/Zone' : 'Nickname'}
-                        </Label>
-                        <Input 
-                          id="accountZone"
-                          value={accountZone}
-                          onChange={(e) => setAccountZone(e.target.value)}
-                          placeholder={category === 'ml' ? "contoh: 1234" : "Masukkan nickname"}
-                          className="mt-1"
-                        />
-                      </div>
-                    )}
-                    
-                    {isSocialMedia && (
-                      <div>
-                        <Label htmlFor="quantity">Jumlah {category === 'instagram' ? 'Followers/Likes' : 'Followers/Likes'}</Label>
-                        <Input 
-                          id="quantity"
-                          type="number"
-                          min="1"
-                          value={quantity}
-                          onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
-                          className="mt-1"
-                        />
-                      </div>
+                {/* Input form untuk informasi akun game atau media sosial */}
+                <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {isGame ? 'User ID' : 'Username'}
+                    </label>
+                    <input
+                      type="text"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2.5 border"
+                      placeholder={isGame ? 'Masukkan User ID' : 'Masukkan Username'}
+                      value={accountId}
+                      onChange={(e) => setAccountId(e.target.value)}
+                    />
+                    {isGame && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Silakan masukkan User ID {isMobileLegends ? 'Mobile Legends' : 'Free Fire'} Anda
+                      </p>
                     )}
                   </div>
                   
-                  <CardFooter className="px-0 pt-6">
-                    <Button type="submit" className="w-full">
-                      Lanjut ke Pembayaran
-                    </Button>
-                  </CardFooter>
-                </form>
-              </CardContent>
+                  {/* Zone ID khusus untuk Mobile Legends */}
+                  {isMobileLegends && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Zone ID
+                      </label>
+                      <input
+                        type="text"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2.5 border"
+                        placeholder="Masukkan Zone ID"
+                        value={accountZone}
+                        onChange={(e) => setAccountZone(e.target.value)}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Zone ID dapat dilihat di profil game Anda
+                      </p>
+                    </div>
+                  )}
+                  
+                  {!isGame && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Link Post
+                      </label>
+                      <input
+                        type="text"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2.5 border"
+                        placeholder={id.includes('likes') ? 'Masukkan link post untuk likes' : 'Opsional - jika diperlukan'}
+                        value={accountZone}
+                        onChange={(e) => setAccountZone(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Opsi produk */}
+                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                  Pilih Paket
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+                  {productCategory.options.map((option: ProductOption) => (
+                    <motion.div
+                      key={option.id}
+                      className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                        selectedOption?.id === option.id
+                          ? 'border-primary bg-primary bg-opacity-10'
+                          : 'border-gray-200 hover:border-primary'
+                      }`}
+                      onClick={() => setSelectedOption(option)}
+                      variants={fadeInItemVariants}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <p className="font-medium text-gray-900">{option.name}</p>
+                      <p className="text-primary font-bold">{formatCurrency(option.price)}</p>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {/* Ringkasan Order */}
+                {selectedOption && (
+                  <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Ringkasan Order</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Produk</span>
+                        <span className="font-medium">{productCategory.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Paket</span>
+                        <span className="font-medium">{selectedOption.name}</span>
+                      </div>
+                      {accountId && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">{isGame ? 'User ID' : 'Username'}</span>
+                          <span className="font-medium">{accountId}</span>
+                        </div>
+                      )}
+                      {isMobileLegends && accountZone && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Zone ID</span>
+                          <span className="font-medium">{accountZone}</span>
+                        </div>
+                      )}
+                      <div className="border-t pt-2 mt-2">
+                        <div className="flex justify-between font-bold">
+                          <span>Total</span>
+                          <span className="text-primary">{formatCurrency(selectedOption.price)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Tombol order */}
+                <RippleButton
+                  color="primary"
+                  fullWidth
+                  className="py-3"
+                  onClick={handleProceedToCheckout}
+                  disabled={!selectedOption || !accountId || (isMobileLegends && !accountZone)}
+                >
+                  {!selectedOption 
+                    ? 'Pilih Paket untuk Melanjutkan' 
+                    : (!accountId || (isMobileLegends && !accountZone)) 
+                      ? 'Isi Informasi Akun untuk Melanjutkan' 
+                      : 'Lanjutkan ke Pembayaran'}
+                </RippleButton>
+              </AnimatedContainer>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
-};
-
-export default ProductDetail;
+}
