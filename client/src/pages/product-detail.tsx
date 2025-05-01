@@ -77,6 +77,7 @@ export default function ProductDetail() {
     if (!selectedOption) return;
     
     const checkoutData = {
+      productId: id, // Field ini dibutuhkan oleh server
       productCategoryId: id,
       productOptionId: selectedOption.id,
       productName: `${productCategory.name} ${selectedOption.name}`,
