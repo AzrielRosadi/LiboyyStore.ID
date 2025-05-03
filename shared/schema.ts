@@ -152,6 +152,7 @@ export const updateContactMessageSchema = z.object({
   adminNotes: z.string().optional(),
 });
 
+
 // Types for the application
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -167,3 +168,6 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type UpdateContactMessage = z.infer<typeof updateContactMessageSchema>;
+
+
+

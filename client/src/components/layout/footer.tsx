@@ -19,17 +19,14 @@ const Footer = () => {
             <h3 className="font-bold text-xl mb-4">LiboyyStore.ID</h3>
             <p className="text-gray-400 mb-4">Layanan top up game dan social media terpercaya dengan harga terbaik dan proses cepat.</p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://www.instagram.com/liboyy_store26/" className="text-gray-400 hover:text-white transition-colors">
                 <i className="fab fa-instagram"></i>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fab fa-twitter"></i>
+              <a href="https://wa.me/6282211944285" className="text-gray-400 hover:text-white transition-colors">
+                <i className="fab fa-whatsapp"></i>
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fab fa-youtube"></i>
+                <i className="fab fa-telegram"></i>
               </a>
             </div>
           </div>
@@ -66,7 +63,7 @@ const Footer = () => {
               </li>
               <li className="flex items-start">
                 <i className="far fa-envelope text-gray-400 mr-2 mt-1"></i>
-                <span className="text-gray-400">support@liboyystore.id</span>
+                <span className="text-gray-400">punyamalibatubara@gmail.com</span>
               </li>
               <li className="flex items-start">
                 <i className="far fa-clock text-gray-400 mr-2 mt-1"></i>

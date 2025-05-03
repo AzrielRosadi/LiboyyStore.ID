@@ -78,7 +78,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-medium">Email</h3>
-                  <p className="text-gray-600">support@liboyystore.id</p>
+                  <p className="text-gray-600">punyamalibatubara@gmail.com</p>
                 </div>
               </div>
               
@@ -88,7 +88,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-medium">Instagram</h3>
-                  <p className="text-gray-600">@liboyy_store</p>
+                  <p className="text-gray-600">@liboyy_store26</p>
                 </div>
               </div>
               

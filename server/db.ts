@@ -1,24 +1,23 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from 'ws';
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from '@shared/schema';
-import { log } from './vite';
+import * as dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
-// Config for Neon database connection
-neonConfig.webSocketConstructor = ws;
-
-// Check if the database URL is provided
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    'DATABASE_URL environment variable is not set. Please create a PostgreSQL database.'
-  );
+// Load dotenv from absolute path
+const envPath = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+  console.log(`Loading .env file from: ${envPath}`);
+  dotenv.config({ path: envPath });
+} else {
+  console.log(`.env file not found at: ${envPath}`);
 }
 
-// Create a connection pool
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Use hardcoded database URL if environment variable is not set
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:azrlrsdi31_@127.0.0.1:5432/liboyystore';
+console.log("Using database URL:", DATABASE_URL.replace(/:[^:]*@/, ':***@')); // hide password
 
-// Initialize Drizzle ORM with our schema
+// Setup PG pool & drizzle
+export const pool = new Pool({ connectionString: DATABASE_URL });
 export const db = drizzle(pool, { schema });
-
-// Log database connection
-log('Database connected successfully', 'drizzle');

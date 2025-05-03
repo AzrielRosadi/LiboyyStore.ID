@@ -28,7 +28,7 @@ const PaymentConfirmation = () => {
         if (!response.ok) {
           throw new Error('Pesanan tidak ditemukan');
         }
-        return response.json() as Order;
+        return (await response.json()) as Order;
       } catch (error) {
         toast({
           variant: "destructive",

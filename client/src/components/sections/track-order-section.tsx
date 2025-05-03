@@ -148,7 +148,7 @@ const TrackOrderSection = () => {
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-200">
                   <span className="text-gray-600">Tanggal Order:</span>
-                  <span className="font-medium">{formatDate(order.createdAt)}</span>
+                  <span className="font-medium">{formatDate(order.createdAt.toString())}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-200">
                   <span className="text-gray-600">Metode Pembayaran:</span>
