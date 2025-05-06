@@ -13,43 +13,45 @@ import { pool } from "./db";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 
-// Promisify scrypt
+// Konversi scrypt ke Promise
 const scryptAsync = promisify(scrypt);
 
-// Storage interface
+// Antarmuka penyimpanan
 export interface IStorage {
-  // User management
+  // Manajemen pengguna
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
   
-  // Order management
+  // Manajemen pesanan
   getAllOrders(filter?: {status?: string}): Promise<Order[]>;
   getOrderById(id: string): Promise<Order | undefined>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: string, updates: Partial<UpdateOrder>): Promise<Order>;
+  deleteOrder(id: string): Promise<void>;
+  deleteAllOrders(): Promise<void>;
   
-  // Contact message management
+  // Manajemen pesan kontak
   getAllContactMessages(): Promise<ContactMessage[]>;
   getContactMessage(id: number): Promise<ContactMessage | undefined>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   updateContactMessage(id: number, updates: UpdateContactMessage): Promise<ContactMessage>;
   
-  // Notification management
+  // Manajemen notifikasi
   createNotification(notification: InsertNotification): Promise<Notification>;
   getAdminNotifications(): Promise<Notification[]>;
   markNotificationAsRead(id: number): Promise<Notification>;
   
-  // Session store for Express
+  // Penyimpanan session untuk Express
   sessionStore: session.Store;
   
-  // Utility methods
+  // Metode utilitas
   hashPassword(password: string): Promise<string>;
   comparePasswords(supplied: string, stored: string): Promise<boolean>;
 }
 
-// Postgres storage implementation
+// Implementasi penyimpanan PostgreSQL
 export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
   
@@ -57,36 +59,38 @@ export class DatabaseStorage implements IStorage {
     const PgStore = ConnectPgSimple(session);
     this.sessionStore = new PgStore({
       pool,
-      tableName: 'session', // Use default session table name
+      tableName: 'session', // Gunakan nama tabel session default
       createTableIfMissing: true
     });
     
-    // Initialize the database with admin user if not exists
+    // Inisialisasi database dengan user admin jika belum ada
     this.initializeAdminUser();
   }
   
+  // Fungsi untuk membuat user admin jika belum ada
   private async initializeAdminUser() {
     const adminExists = await this.getUserByUsername("admin");
     
     if (!adminExists) {
-      // Create admin user with hashed password
+      // Buat user admin dengan password terenkripsi
       const hashedPassword = await this.hashPassword("admin123");
       await this.createUser({
         username: "admin",
         password: hashedPassword,
         isAdmin: true
       });
-      console.log("Admin user created successfully");
+      console.log("User admin berhasil dibuat");
     }
   }
   
-  // Password utilities
+  // Fungsi untuk mengenkripsi password
   async hashPassword(password: string): Promise<string> {
     const salt = randomBytes(16).toString("hex");
     const buf = (await scryptAsync(password, salt, 64)) as Buffer;
     return `${buf.toString("hex")}.${salt}`;
   }
   
+  // Fungsi untuk membandingkan password
   async comparePasswords(supplied: string, stored: string): Promise<boolean> {
     const [hashed, salt] = stored.split(".");
     const hashedBuf = Buffer.from(hashed, "hex");
@@ -94,7 +98,8 @@ export class DatabaseStorage implements IStorage {
     return timingSafeEqual(hashedBuf, suppliedBuf);
   }
 
-  // User methods
+  // ========== MANAJEMEN PENGGUNA ==========
+  
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result.length ? result[0] : undefined;
@@ -119,7 +124,8 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Order methods
+  // ========== MANAJEMEN PESANAN ==========
+  
   async getAllOrders(filter?: {status?: string}): Promise<Order[]> {
     if (filter?.status) {
       return await db.select()
@@ -139,7 +145,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrder(orderData: InsertOrder): Promise<Order> {
-    // Generate order ID
+    // Generate ID pesanan
     const orderId = `ORD-${nanoid(6).toUpperCase()}`;
     
     const [order] = await db
@@ -150,10 +156,10 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    // Create notification for admin
+    // Buat notifikasi untuk admin
     await this.createNotification({
-      title: "New Order Received",
-      message: `A new order #${orderId} for ${orderData.productName} has been placed.`,
+      title: "Pesanan Baru Diterima",
+      message: `Pesanan baru #${orderId} untuk ${orderData.productName} telah dibuat.`,
       type: "info",
       isForAdmin: true,
       data: {
@@ -170,10 +176,10 @@ export class DatabaseStorage implements IStorage {
     const currentOrder = await this.getOrderById(id);
     
     if (!currentOrder) {
-      throw new Error(`Order with ID ${id} not found`);
+      throw new Error(`Pesanan dengan ID ${id} tidak ditemukan`);
     }
     
-    // Set updatedAt to current timestamp
+    // Set updatedAt ke timestamp saat ini
     const updateData = {
       ...updates,
       updatedAt: new Date()
@@ -185,11 +191,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(orders.id, id))
       .returning();
     
-    // If status changed, create a notification
+    // Jika status berubah, buat notifikasi
     if (updates.status && updates.status !== currentOrder.status) {
       await this.createNotification({
-        title: `Order Status Updated`,
-        message: `Order #${id} status changed from ${currentOrder.status} to ${updates.status}.`,
+        title: `Status Pesanan Diperbarui`,
+        message: `Status pesanan #${id} berubah dari ${currentOrder.status} menjadi ${updates.status}.`,
         type: "info",
         isForAdmin: true,
         data: {
@@ -202,8 +208,28 @@ export class DatabaseStorage implements IStorage {
     
     return updatedOrder;
   }
+  
+  // Fungsi untuk menghapus pesanan tunggal
+  async deleteOrder(id: string): Promise<void> {
+    // Hapus notifikasi terkait terlebih dahulu
+    await db.delete(notifications).where(eq(notifications.orderId, id));
+    
+    // Kemudian hapus pesanan
+    await db.delete(orders).where(eq(orders.id, id));
+  }
+  
+  // Fungsi untuk menghapus semua pesanan
+  async deleteAllOrders(): Promise<void> {
+    
+    // Hapus semua notifikasi terlebih dahulu
+    await db.delete(notifications).where(isNull(notifications.orderId));
+    
+    // Kemudian hapus semua pesanan
+    await db.delete(orders);
+  }
 
-  // Contact message methods
+  // ========== MANAJEMEN PESAN KONTAK ==========
+  
   async getAllContactMessages(): Promise<ContactMessage[]> {
     return await db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
   }
@@ -219,10 +245,10 @@ export class DatabaseStorage implements IStorage {
       .values(message)
       .returning();
     
-    // Create notification for admin
+    // Buat notifikasi untuk admin
     await this.createNotification({
-      title: "New Contact Message",
-      message: `You received a new contact message from ${message.name}.`,
+      title: "Pesan Kontak Baru",
+      message: `Anda menerima pesan kontak baru dari ${message.name}.`,
       type: "info",
       isForAdmin: true,
       data: {
@@ -248,7 +274,8 @@ export class DatabaseStorage implements IStorage {
     return message;
   }
   
-  // Notification methods
+  // ========== MANAJEMEN NOTIFIKASI ==========
+  
   async createNotification(notification: InsertNotification): Promise<Notification> {
     const [newNotification] = await db
       .insert(notifications)
@@ -277,4 +304,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
+// Ekspor instance penyimpanan
 export const storage = new DatabaseStorage();

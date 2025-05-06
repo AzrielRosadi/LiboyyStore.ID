@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import * as schema from "@shared/schema";
 import { log } from "./vite";
 
+
 // Define a type for user in the system
 type AppUser = schema.User;
 
@@ -21,6 +22,7 @@ export function setupAuth(app: Express) {
     },
     store: storage.sessionStore,
   };
+  
 
   app.set("trust proxy", 1);
   app.use(session(sessionSettings));

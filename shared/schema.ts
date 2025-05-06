@@ -168,6 +168,3 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type UpdateContactMessage = z.infer<typeof updateContactMessageSchema>;
-
-
-

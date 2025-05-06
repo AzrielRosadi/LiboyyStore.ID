@@ -140,7 +140,7 @@ const HeroSection = () => {
             <motion.img
               src="/images/logoliboyynew.png"
               alt="Gaming Experience"
-              className="rounded-lg shadow-lg w-full h-auto"
+              className="w-full h-auto max-w-md mx-auto"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}

@@ -1,7 +1,5 @@
-// Type declarations for express and multer
+// types.d.ts
 import 'express-session';
-import { Session } from 'express-session';
-import { Request } from 'express';
 
 declare global {
   namespace Express {
@@ -10,12 +8,24 @@ declare global {
       file?: Express.Multer.File;
     }
   }
-}
 
-declare module 'express-session' {
   interface SessionData {
     adminToken?: string;
     isAdmin?: boolean;
     contactInfo?: string;
   }
 }
+
+declare module 'qrcode-terminal' {
+  function generate(text: string, options?: { small?: boolean }): void;
+  export = generate;
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    contactInfo?: string;
+    // Add other custom session properties here
+  }
+}
+
+export {};

@@ -1,16 +1,16 @@
-import * as dotenv from 'dotenv';
-import path from 'path';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-
-
-// Explicitly load .env file
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+import { initWhatsApp } from "./whatsapp";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Serve uploaded files
+const uploadDir = path.join(process.cwd(), "uploads");
+app.use('/uploads', express.static(uploadDir));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -65,8 +65,16 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen(port, "127.0.0.1", () => {
+  const port = 5000; server.listen(port, "127.0.0.1", () => {
     log(`serving on http://127.0.0.1:${port}`);
-  });  
+
+    // Inisialisasi WhatsApp setelah server berjalan
+    try {
+      // Fitur WhatsApp dinonaktifkan karena masalah dependensi di Replit
+      initWhatsApp();
+      log(`WhatsApp client initialization is disabled due to dependency issues in Replit environment.`);
+    } catch (error) {
+      log(`Error initializing WhatsApp: ${error}`);
+    }
+  });
 })();

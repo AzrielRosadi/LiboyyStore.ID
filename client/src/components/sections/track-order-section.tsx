@@ -12,7 +12,22 @@ const TrackOrderSection = () => {
   const { toast } = useToast();
 
   const { data: order, error, isLoading, refetch } = useQuery<Order>({
-    queryKey: [`/api/orders/${orderId}`],
+    queryKey: [`/api/orders/${orderId}`, email],
+    queryFn: async () => {
+      if (!orderId || !email) {
+        throw new Error('Order ID and contact information are required');
+      }
+      
+      const res = await fetch(`/api/orders/${orderId}?contact=${encodeURIComponent(email)}`);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`Error fetching order: ${errorText}`);
+        throw new Error('Order not found or access denied');
+      }
+      
+      return res.json();
+    },
     enabled: false,
   });
 
@@ -50,8 +65,8 @@ const TrackOrderSection = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: string | Date) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return new Intl.DateTimeFormat('id-ID', {
       day: '2-digit',
       month: 'short',
@@ -64,8 +79,10 @@ const TrackOrderSection = () => {
   const getStatusClass = (status: string) => {
     switch(status) {
       case 'pending': return 'text-yellow-500';
+      case 'waiting': return 'text-orange-500';
       case 'processing': return 'text-blue-500';
       case 'completed': return 'text-green-500';
+      case 'cancelled': return 'text-red-500';
       default: return 'text-gray-500';
     }
   };
@@ -73,8 +90,10 @@ const TrackOrderSection = () => {
   const getStatusText = (status: string) => {
     switch(status) {
       case 'pending': return 'Menunggu Pembayaran';
+      case 'waiting': return 'Pembayaran Diperiksa';
       case 'processing': return 'Diproses';
       case 'completed': return 'Selesai';
+      case 'cancelled': return 'Dibatalkan';
       default: return status;
     }
   };
@@ -148,7 +167,7 @@ const TrackOrderSection = () => {
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-200">
                   <span className="text-gray-600">Tanggal Order:</span>
-                  <span className="font-medium">{formatDate(order.createdAt.toString())}</span>
+                  <span className="font-medium">{formatDate(order.createdAt)}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-200">
                   <span className="text-gray-600">Metode Pembayaran:</span>
