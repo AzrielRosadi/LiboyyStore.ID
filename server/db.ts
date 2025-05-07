@@ -15,7 +15,7 @@ if (fs.existsSync(envPath)) {
 }
 
 // Use hardcoded database URL if environment variable is not set
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:azrlrsdi31_@127.0.0.1:5432/liboyystore';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:310307@127.0.0.1:5432/liboyystore';
 console.log("Using database URL:", DATABASE_URL.replace(/:[^:]*@/, ':***@')); // hide password
 
 // Setup PG pool & drizzle

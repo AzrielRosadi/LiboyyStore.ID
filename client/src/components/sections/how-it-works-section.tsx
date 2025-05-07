@@ -13,12 +13,12 @@ const HowItWorksSection = () => {
     {
       number: 3,
       title: "Pembayaran",
-      description: "Lakukan pembayaran melalui metode pembayaran yang tersedia dan jangan lupa salin ID pesanan, contoh: ORD-HLGV7S"
+      description: "Lakukan pembayaran melalui metode pembayaran yang tersedia dan jangan lupa salin ID pesanan, contoh: ORD-HLGV7S. Dan menggunakan ID tersebut untuk Melihat Pesanan anda pada bagian Cari Pesanan."
     },
     {
       number: 4,
       title: "Konfirmasi",
-      description: "Konfirmasi pembayaran Anda dan tunggu proses selesai. NOTE! Jangan Lupa Screenshoot Detail Pembayaran dan Kirim Ke WhaatsApp Admin."
+      description: "Konfirmasi pembayaran Anda bisa Langsung mengirimkan Detail Pesanan ke WhatsApp Admin agar langsung bisa Diproses dengan Klik Icon WhatsApp pada Hubungi Admin. Dan tunggu pesanan Anda."
     }
   ];
 
